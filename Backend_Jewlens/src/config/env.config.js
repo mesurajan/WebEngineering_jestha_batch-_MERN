@@ -1,0 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+export const env = {
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  MONGO_URI: process.env.MONGO_URI,
+  DNS_SERVERS: process.env.DNS_SERVERS,
+  CLIENT_URL: process.env.CLIENT_URL,
+};

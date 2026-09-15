@@ -1,0 +1,21 @@
+{
+  "name": "backend_jewlens",
+  "version": "1.0.0",
+  "description": "This is the backend for the Jewlens project, which provides the necessary APIs and services to support the frontend application. It handles data management, user authentication, and other server-side functionalities.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.9.5",
+    "nodemon": "^3.1.14"
+  }
+}
