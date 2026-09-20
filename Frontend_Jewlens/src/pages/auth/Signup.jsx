@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API_URL from "../../api/api";
 import axios from "axios";
+import API_URL from "../../api/api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -9,13 +9,26 @@ function Signup() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    address: "",
     password: "",
     confirmPassword: "",
     terms: false,
-    phone: "",
-    address: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
+  // Handle all inputs
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  // Handle registration
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -25,194 +38,267 @@ function Signup() {
     }
 
     if (!formData.terms) {
-      alert("Please accept the terms");
+      alert("Please accept the terms and conditions");
       return;
     }
 
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        method: "POST",
+      setLoading(true);
 
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify(formData),
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        password: formData.password,
       });
 
-      const data = await response.json();
+      console.log("Registration Response:", response.data);
 
-      if (response.ok) {
-        alert("Registration successful");
+      alert("Registration successful");
 
-        navigate("/login");
-      } else {
-        if (data.errors && data.errors.length > 0) {
-          alert(data.errors[0].message);
-        } else {
-          alert(data.message || "Registration failed");
-        }
-      }
+      navigate("/login");
     } catch (error) {
       console.error("Signup Error:", error);
 
-      alert("Unable to connect to server");
+      const message =
+        error.response?.data?.errors?.[0]?.message ||
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
+
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Signup Form</h1>
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-8">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl lg:grid-cols-2">
+        {/* Left Section */}
+        <div className="hidden bg-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+          <div>
+            <span className="inline-block rounded-full bg-white/10 px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-200">
+              WELCOME
+            </span>
 
-      <form onSubmit={handleSubmit}>
-        {/* Name */}
-        <label>Name:</label>
-        <br />
+            <h1 className="mt-8 text-4xl font-bold leading-tight">
+              Create your account and get started.
+            </h1>
 
-        <input
-          type="text"
-          placeholder="Enter your name"
-          value={formData.name}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              name: e.target.value,
-            })
-          }
-          required
-        />
+            <p className="mt-5 max-w-md text-sm leading-7 text-slate-400">
+              Join our platform and manage your account, explore products, and
+              enjoy a simple and secure shopping experience.
+            </p>
+          </div>
 
-        <br />
-        <br />
+          <div className="space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm">
+                ✓
+              </div>
 
-        {/* Email */}
-        <label>Email:</label>
-        <br />
+              <p className="text-sm text-slate-300">Easy account management</p>
+            </div>
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={formData.email}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              email: e.target.value,
-            })
-          }
-          required
-        />
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm">
+                ✓
+              </div>
 
-        <br />
-        <br />
+              <p className="text-sm text-slate-300">
+                Secure registration process
+              </p>
+            </div>
 
-        {/* Phone */}
-        <label>Phone:</label>
-        <br />
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm">
+                ✓
+              </div>
 
-        <input
-          type="text"
-          placeholder="+977 9800000000"
-          value={formData.phone}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              phone: e.target.value,
-            })
-          }
-          required
-        />
+              <p className="text-sm text-slate-300">
+                Simple shopping experience
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <br />
-        <br />
+        {/* Form Section */}
+        <div className="p-6 sm:p-10 lg:p-12">
+          {/* Mobile Header */}
+          <div className="mb-8 lg:hidden">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+              Welcome
+            </span>
 
-        {/* Address */}
-        <label>Address:</label>
-        <br />
+            <h1 className="mt-2 text-2xl font-bold text-slate-900">
+              Create your account
+            </h1>
+          </div>
 
-        <input
-          type="text"
-          placeholder="Kathmandu, Nepal"
-          value={formData.address}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              address: e.target.value,
-            })
-          }
-          required
-        />
+          {/* Desktop Header */}
+          <div className="mb-8 hidden lg:block">
+            <h2 className="text-3xl font-bold text-slate-900">
+              Create Account
+            </h2>
 
-        <br />
-        <br />
+            <p className="mt-2 text-sm text-slate-500">
+              Fill in your details below to create your account.
+            </p>
+          </div>
 
-        {/* Password */}
-        <label>Password:</label>
-        <br />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Name + Email */}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Full Name
+                </label>
 
-        <input
-          type="password"
-          placeholder="Enter password"
-          value={formData.password}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              password: e.target.value,
-            })
-          }
-          required
-        />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
 
-        <br />
-        <br />
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Email Address
+                </label>
 
-        {/* Confirm Password */}
-        <label>Confirm Password:</label>
-        <br />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="example@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
 
-        <input
-          type="password"
-          placeholder="Confirm password"
-          value={formData.confirmPassword}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              confirmPassword: e.target.value,
-            })
-          }
-          required
-        />
+            {/* Phone + Address */}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Phone Number
+                </label>
 
-        <br />
-        <br />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="+977 9800000000"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
 
-        {/* Terms */}
-        <label>
-          <input
-            type="checkbox"
-            checked={formData.terms}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                terms: e.target.checked,
-              })
-            }
-          />{" "}
-          I agree to the terms and conditions
-        </label>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Address
+                </label>
 
-        <br />
-        <br />
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Kathmandu, Nepal"
+                  value={formData.address}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
 
-        <button type="submit">Signup</button>
-      </form>
+            {/* Password */}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Password
+                </label>
 
-      <br />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
 
-      <p>
-        Already have an account?{" "}
-        <button type="button" onClick={() => navigate("/login")}>
-          Login
-        </button>
-      </p>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Confirm Password
+                </label>
+
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
+
+            {/* Terms */}
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                name="terms"
+                checked={formData.terms}
+                onChange={handleChange}
+                className="mt-1 h-4 w-4 cursor-pointer rounded border-slate-300 accent-slate-900"
+              />
+
+              <span className="text-sm leading-6 text-slate-500">
+                I agree to the{" "}
+                <span className="font-semibold text-slate-900">
+                  Terms & Conditions
+                </span>{" "}
+                and{" "}
+                <span className="font-semibold text-slate-900">
+                  Privacy Policy
+                </span>
+                .
+              </span>
+            </label>
+
+            {/* Signup Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+            </button>
+          </form>
+
+          {/* Login */}
+          <p className="mt-7 text-center text-sm text-slate-500">
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="font-semibold text-slate-950 hover:underline"
+            >
+              Login
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

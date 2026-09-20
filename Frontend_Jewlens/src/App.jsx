@@ -12,7 +12,7 @@ import AdminProductCreate from "./pages/adminpages/AdminProductCreate";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoutes from "./hoc/ProtectedRoutes";
 import ProductDetails from "./components/product/ProductDetails";
-import Signup from "./pages/auth/signup";
+import Signup from "./pages/auth/Signup";
 function App() {
   return (
     <>
